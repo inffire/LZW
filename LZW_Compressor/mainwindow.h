@@ -7,7 +7,8 @@
 #include <QByteArray>
 #include <QFileDialog>
 #include <cmath>
-#include "ctime"
+#include <ctime>
+#include <vector>
 
 namespace Ui {
 class MainWindow;
@@ -19,9 +20,9 @@ class MainWindow : public QMainWindow
     QFile* file;
     QByteArray* byteArrayFile;
     QList<QByteArray> byteArrayLibrary;
-    QList<char> charArrayFile;
-    QList<char> charArrayCopmression;
-    QList<char> charArrayDeCopmression;
+    std::vector<char> charArrayFile;
+    std::vector<char> charArrayCopmression;
+    std::vector<char> charArrayDeCopmression;
 
     char libraryByteRate = 1;
     int librarySize;

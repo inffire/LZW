@@ -36,7 +36,7 @@ void MainWindow::on_actionOpen_triggered()
             charArrayFile.clear();
             for(int i = 0; i < byteArrayFile->count(); i++)
             {
-                charArrayFile.append(byteArrayFile->at(i));
+                charArrayFile.push_back(byteArrayFile->at(i));
                 ui->progressBar_dataByte->setValue((double)i / byteArrayFile->count() * 100.0);
             }
             ui->progressBar_dataByte->setValue(100.0);
@@ -47,50 +47,46 @@ void MainWindow::on_actionOpen_triggered()
 
 void MainWindow::on_actionCompress_triggered()
 {
-    if(!charArrayFile.isEmpty())
+    if(charArrayFile.size() > 0)
     {
         byteArrayLibrary.clear();
         byteArrayLibrary.append(QByteArray(libraryByteRate, 0));
         charArrayCopmression.clear();
 
-        QByteArray wordFind;
+        QByteArray wordsFind;
         char word = 0;
-        int curByteFile = 0;
+        int curFileByte = 0;
         int curLibraryAddr = 0;
         int libraryAddr = 0;
-        QByteArray ByteLibraryAddr = QByteArray(libraryByteRate, 0);
-        int wordLength = 0;
-        int maxWordLength = 0;
+        QList<char> ByteLibraryAddr;
         bool hasAddr = false;
 
         clock_t time = clock();
 
         do
         {
-            wordFind.clear();
+            wordsFind.clear();
             word = 0;
             curLibraryAddr = 1;
             libraryAddr = 0;
-            wordLength = 0;
             hasAddr = false;
             do
             {
-                word = charArrayFile.at(curByteFile);
-                wordFind.append(charArrayFile.at(curByteFile));
-                curLibraryAddr = byteArrayLibrary.indexOf(wordFind, curLibraryAddr);
+                word = charArrayFile.at(curFileByte);
+                wordsFind.append(charArrayFile.at(curFileByte));
+                curLibraryAddr = byteArrayLibrary.indexOf(wordsFind, curLibraryAddr);
                 if(curLibraryAddr > 0)
                 {
-                    wordLength++;
                     libraryAddr = curLibraryAddr;
-                    if(curByteFile == charArrayFile.count() - 1)
+                    if(curFileByte == (int)charArrayFile.size() - 1)
                     {
-                        wordFind.clear();
+                        wordsFind.clear();
                         word = 0;
                         hasAddr = false;
                     }
                     else
                     {
-                        curByteFile++;
+                        curFileByte++;
                         hasAddr = true;
                     }
                 }
@@ -100,28 +96,26 @@ void MainWindow::on_actionCompress_triggered()
                 }
             }
             while(hasAddr);
-            if(wordLength > maxWordLength)
-                maxWordLength = wordLength;
 
             ByteLibraryAddr.clear();
-            for(int b = libraryByteRate - 1; b >= 0; b--)
+            for(char b = libraryByteRate - 1; b >= 0; b--)
             {
                 ByteLibraryAddr.append((libraryAddr >> (b * 8)) & 0xFF);
             }
 
-            for(int i = 0; i < ByteLibraryAddr.count(); i++)
-                charArrayCopmression.append(ByteLibraryAddr.at(i));
-            charArrayCopmression.append(word);
+            for(char i = 0; i < ByteLibraryAddr.count(); i++)
+                charArrayCopmression.push_back(ByteLibraryAddr.at(i));
+            charArrayCopmression.push_back(word);
             if(byteArrayLibrary.count() < librarySize)
-                byteArrayLibrary.append(wordFind);
+                byteArrayLibrary.append(wordsFind);
 
-            ui->progressBar_dataByte->setValue((double)curByteFile / charArrayFile.count() * 100.0);
+            ui->progressBar_dataByte->setValue((double)curFileByte / charArrayFile.size() * 100.0);
             ui->progressBar_dataLibrary->setValue((double)byteArrayLibrary.count() / librarySize * 100.0);
-            curByteFile++;
+            curFileByte++;
         }
-        while(curByteFile < charArrayFile.count());
+        while(curFileByte < (int)charArrayFile.size());
 
-        ui->label_ResultSize_value->setText(QString::number(charArrayCopmression.count()));
+        ui->label_ResultSize_value->setText(QString::number(charArrayCopmression.size()));
         time = clock() - time;
         ui->label_Time_value->setText(QString::number(time));
 
@@ -134,7 +128,7 @@ void MainWindow::on_actionCompress_triggered()
                 ui->progressBar_dataByte->setValue(0.0);
                 delete byteArrayFile;
                 byteArrayFile = new QByteArray();
-                for(QList<char>::iterator i = charArrayCopmression.begin(); i != charArrayCopmression.end(); i++)
+                for(std::vector<char>::iterator i = charArrayCopmression.begin(); i != charArrayCopmression.end(); i++)
                 {
                     byteArrayFile->append(*i);
                 }
@@ -148,7 +142,7 @@ void MainWindow::on_actionCompress_triggered()
 
 void MainWindow::on_actionDeCompress_triggered()
 {
-    if(!charArrayFile.isEmpty())
+    if(charArrayFile.size() > 0)
     {
         charArrayDeCopmression.clear();
         byteArrayLibrary.clear();
@@ -173,7 +167,7 @@ void MainWindow::on_actionDeCompress_triggered()
             }
             if(addrInt != 0)
                 newWord.append(byteArrayLibrary.at(addrInt));
-            if(!((i + libraryByteRate) == (charArrayFile.count() - 1) && (charArrayFile.at(i + libraryByteRate) == 0)))
+            if(!((i + libraryByteRate) == ((int)charArrayFile.size() - 1) && (charArrayFile.at(i + libraryByteRate) == 0)))
                 newWord.append(charArrayFile.at(i + libraryByteRate));
 
             if(byteArrayLibrary.count() < librarySize)
@@ -182,14 +176,14 @@ void MainWindow::on_actionDeCompress_triggered()
             }
 
             for(int j = 0; j < newWord.count(); j++)
-                charArrayDeCopmression.append((uchar)newWord.at(j));
+                charArrayDeCopmression.push_back((uchar)newWord.at(j));
             i+= (libraryByteRate + 1);
-            ui->progressBar_dataByte->setValue((double)i / charArrayFile.count() * 100.0);
+            ui->progressBar_dataByte->setValue((double)i / charArrayFile.size() * 100.0);
         }
-        while(i < charArrayFile.count());
+        while(i < (int)charArrayFile.size());
 
         ui->progressBar_dataByte->setValue(100.0);
-        ui->label_ResultSize_value->setText(QString::number(charArrayDeCopmression.count()));
+        ui->label_ResultSize_value->setText(QString::number(charArrayDeCopmression.size()));
         time = clock() - time;
         ui->label_Time_value->setText(QString::number(time));
 
@@ -201,7 +195,7 @@ void MainWindow::on_actionDeCompress_triggered()
             {
                 ui->progressBar_dataByte->setValue(0.0);
                 byteArrayFile->clear();
-                for(QList<char>::iterator i = charArrayDeCopmression.begin(); i != charArrayDeCopmression.end(); i++)
+                for(std::vector<char>::iterator i = charArrayDeCopmression.begin(); i != charArrayDeCopmression.end(); i++)
                 {
                     byteArrayFile->append(*i);
                 }
