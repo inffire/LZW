@@ -6,26 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>795</width>
-    <height>568</height>
+    <width>480</width>
+    <height>294</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>LPZ Compressor</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="3" column="0">
-     <widget class="QProgressBar" name="progressBar_dataByte">
-      <property name="value">
-       <number>0</number>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="0">
      <widget class="QGroupBox" name="groupBox">
       <property name="title">
-       <string>Name File</string>
+       <string>Filename</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
@@ -73,34 +66,27 @@
       </layout>
      </widget>
     </item>
-    <item row="2" column="0">
-     <widget class="QProgressBar" name="progressBar_dataLibrary">
-      <property name="value">
-       <number>0</number>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="0">
      <widget class="QGroupBox" name="groupBox_2">
       <property name="title">
-       <string>Library Byte Rate</string>
+       <string>Dictionary</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="2">
-        <widget class="QLabel" name="label_LibraryLength_text">
+       <item row="0" column="1">
+        <widget class="QLabel" name="label_dictAddressLength_text">
          <property name="text">
-          <string>Library Length:</string>
+          <string>Dictionary address length</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="label">
+       <item row="1" column="4">
+        <widget class="QLabel" name="label_LibraryLength_value">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
+       <item row="1" column="1">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_LibraryByteRate">
          <property name="decimals">
           <number>0</number>
@@ -113,14 +99,35 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="3">
-        <widget class="QLabel" name="label_LibraryLength_value">
+       <item row="1" column="3">
+        <widget class="QLabel" name="label_LibraryLength_text">
          <property name="text">
-          <string/>
+          <string>Library Length</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QLabel" name="label_dictNote1_text">
+         <property name="text">
+          <string>bytes</string>
          </property>
         </widget>
        </item>
       </layout>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QProgressBar" name="progressBar_dataLibrary">
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QProgressBar" name="progressBar_dataByte">
+      <property name="value">
+       <number>0</number>
+      </property>
      </widget>
     </item>
    </layout>
@@ -130,8 +137,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>795</width>
-     <height>26</height>
+     <width>480</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -143,14 +150,6 @@
     <addaction name="actionDeCompress"/>
    </widget>
    <addaction name="menuFile"/>
-  </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionOpen">

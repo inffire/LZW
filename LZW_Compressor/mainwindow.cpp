@@ -6,6 +6,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setFixedSize(QSize(480, 294));
+    setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint);
     file = new QFile();
     byteArrayFile = new QByteArray();
 
@@ -34,11 +36,9 @@ void MainWindow::on_actionOpen_triggered()
             byteArrayFile = new QByteArray(file->readAll());
             file->close();
             charArrayFile.clear();
-            for(int i = 0; i < byteArrayFile->count(); i++)
-            {
-                charArrayFile.push_back(byteArrayFile->at(i));
-                ui->progressBar_dataByte->setValue((double)i / byteArrayFile->count() * 100.0);
-            }
+            char* begin = reinterpret_cast<char*>(byteArrayFile->data());
+            char* end = begin + byteArrayFile->length();
+            charArrayFile.assign(begin, end);
             ui->progressBar_dataByte->setValue(100.0);
             ui->label_FileSize_value->setText(QString::number(byteArrayFile->count()));
         }
@@ -60,6 +60,7 @@ void MainWindow::on_actionCompress_triggered()
         int libraryAddr = 0;
         QList<char> ByteLibraryAddr;
         bool hasAddr = false;
+        size_t fileSize = charArrayFile.size();
 
         clock_t time = clock();
 
@@ -73,12 +74,12 @@ void MainWindow::on_actionCompress_triggered()
             do
             {
                 word = charArrayFile.at(curFileByte);
-                wordsFind.append(charArrayFile.at(curFileByte));
+                wordsFind.append(word);
                 curLibraryAddr = byteArrayLibrary.indexOf(wordsFind, curLibraryAddr);
                 if(curLibraryAddr > 0)
                 {
                     libraryAddr = curLibraryAddr;
-                    if(curFileByte == (int)charArrayFile.size() - 1)
+                    if(curFileByte == fileSize - 1)
                     {
                         wordsFind.clear();
                         word = 0;
@@ -128,10 +129,7 @@ void MainWindow::on_actionCompress_triggered()
                 ui->progressBar_dataByte->setValue(0.0);
                 delete byteArrayFile;
                 byteArrayFile = new QByteArray();
-                for(std::vector<char>::iterator i = charArrayCopmression.begin(); i != charArrayCopmression.end(); i++)
-                {
-                    byteArrayFile->append(*i);
-                }
+                byteArrayFile->setRawData(reinterpret_cast<const char*>(charArrayCopmression.data()), charArrayCopmression.size());
                 file->write(*byteArrayFile);
                 ui->progressBar_dataByte->setValue(100.0);
                 file->close();
@@ -195,10 +193,7 @@ void MainWindow::on_actionDeCompress_triggered()
             {
                 ui->progressBar_dataByte->setValue(0.0);
                 byteArrayFile->clear();
-                for(std::vector<char>::iterator i = charArrayDeCopmression.begin(); i != charArrayDeCopmression.end(); i++)
-                {
-                    byteArrayFile->append(*i);
-                }
+                byteArrayFile->setRawData(reinterpret_cast<const char*>(charArrayDeCopmression.data()), charArrayDeCopmression.size());
                 file->write(*byteArrayFile);
                 ui->progressBar_dataByte->setValue(100.0);
                 file->close();
