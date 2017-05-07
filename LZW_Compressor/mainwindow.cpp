@@ -47,157 +47,56 @@ void MainWindow::on_actionOpen_triggered()
 
 void MainWindow::on_actionCompress_triggered()
 {
-    if(charArrayFile.size() > 0)
+    CLZWCompressor c;
+    std::vector<uchar> out;
+    time_t t = clock();
+
+    connect(&c, SIGNAL(passed_process(int)), ui->progressBar_dataByte, SLOT(setValue(int)));
+    connect(&c, SIGNAL(library_capacity_changed(int)), ui->progressBar_dataLibrary, SLOT(setValue(int)));
+    c.set_library_address_length((int)ui->doubleSpinBox_LibraryByteRate->value());
+    c.compress(charArrayFile, out);
+
+    ui->label_Time_value->setText(QString::number(clock() - t));
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), "", "");
+    if(!fileName.isEmpty())
     {
-        byteArrayLibrary.clear();
-        byteArrayLibrary.append(QByteArray(libraryByteRate, 0));
-        charArrayCopmression.clear();
-
-        QByteArray wordsFind;
-        char word = 0;
-        int curFileByte = 0;
-        int curLibraryAddr = 0;
-        int libraryAddr = 0;
-        QList<char> ByteLibraryAddr;
-        bool hasAddr = false;
-        size_t fileSize = charArrayFile.size();
-
-        clock_t time = clock();
-
-        do
+        file->setFileName(fileName);
+        if(file->open(QIODevice::WriteOnly))
         {
-            wordsFind.clear();
-            word = 0;
-            curLibraryAddr = 1;
-            libraryAddr = 0;
-            hasAddr = false;
-            do
-            {
-                word = charArrayFile.at(curFileByte);
-                wordsFind.append(word);
-                curLibraryAddr = byteArrayLibrary.indexOf(wordsFind, curLibraryAddr);
-                if(curLibraryAddr > 0)
-                {
-                    libraryAddr = curLibraryAddr;
-                    if(curFileByte == fileSize - 1)
-                    {
-                        wordsFind.clear();
-                        word = 0;
-                        hasAddr = false;
-                    }
-                    else
-                    {
-                        curFileByte++;
-                        hasAddr = true;
-                    }
-                }
-                else
-                {
-                    hasAddr = false;
-                }
-            }
-            while(hasAddr);
-
-            ByteLibraryAddr.clear();
-            for(char b = libraryByteRate - 1; b >= 0; b--)
-            {
-                ByteLibraryAddr.append((libraryAddr >> (b * 8)) & 0xFF);
-            }
-
-            for(char i = 0; i < ByteLibraryAddr.count(); i++)
-                charArrayCopmression.push_back(ByteLibraryAddr.at(i));
-            charArrayCopmression.push_back(word);
-            if(byteArrayLibrary.count() < librarySize)
-                byteArrayLibrary.append(wordsFind);
-
-            ui->progressBar_dataByte->setValue((double)curFileByte / charArrayFile.size() * 100.0);
-            ui->progressBar_dataLibrary->setValue((double)byteArrayLibrary.count() / librarySize * 100.0);
-            curFileByte++;
-        }
-        while(curFileByte < (int)charArrayFile.size());
-
-        ui->label_ResultSize_value->setText(QString::number(charArrayCopmression.size()));
-        time = clock() - time;
-        ui->label_Time_value->setText(QString::number(time));
-
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), "", "");
-        if(!fileName.isEmpty())
-        {
-            file->setFileName(fileName);
-            if(file->open(QIODevice::WriteOnly))
-            {
-                ui->progressBar_dataByte->setValue(0.0);
-                delete byteArrayFile;
-                byteArrayFile = new QByteArray();
-                byteArrayFile->setRawData(reinterpret_cast<const char*>(charArrayCopmression.data()), charArrayCopmression.size());
-                file->write(*byteArrayFile);
-                ui->progressBar_dataByte->setValue(100.0);
-                file->close();
-            }
+            byteArrayFile = new QByteArray();
+            byteArrayFile->setRawData(reinterpret_cast<const char*>(out.data()), out.size());
+            file->write(*byteArrayFile);
+            file->close();
         }
     }
 }
 
 void MainWindow::on_actionDeCompress_triggered()
 {
-    if(charArrayFile.size() > 0)
+    CLZWDecompressor d;
+    std::vector<uchar> out;
+    time_t t = clock();
+
+    connect(&d, SIGNAL(passed_process(int)), ui->progressBar_dataByte, SLOT(setValue(int)));
+    connect(&d, SIGNAL(library_capacity_changed(int)), ui->progressBar_dataLibrary, SLOT(setValue(int)));
+    d.set_library_address_length((int)ui->doubleSpinBox_LibraryByteRate->value());
+    d.decompress(charArrayFile, out);
+
+    ui->label_Time_value->setText(QString::number(clock() - t));
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), "", "");
+    if(!fileName.isEmpty())
     {
-        charArrayDeCopmression.clear();
-        byteArrayLibrary.clear();
-        byteArrayLibrary.append(QByteArray(libraryByteRate, 0));
-        QByteArray findAddr;
-        QByteArray newWord;
-        clock_t time = clock();
-
-        int i = 0;
-        do
+        file->setFileName(fileName);
+        if(file->open(QIODevice::WriteOnly))
         {
-            findAddr.clear();
-            newWord.clear();
-            for(int b = 0; b < libraryByteRate; b++)
-            {
-                findAddr.append(charArrayFile.at(i + b));
-            }
-            int addrInt = 0;
-            for(int i = 0; i < libraryByteRate; i++)
-            {
-                addrInt += (uchar)findAddr.at(libraryByteRate - 1 - i) * (pow(256, i));
-            }
-            if(addrInt != 0)
-                newWord.append(byteArrayLibrary.at(addrInt));
-            if(!((i + libraryByteRate) == ((int)charArrayFile.size() - 1) && (charArrayFile.at(i + libraryByteRate) == 0)))
-                newWord.append(charArrayFile.at(i + libraryByteRate));
-
-            if(byteArrayLibrary.count() < librarySize)
-            {
-                byteArrayLibrary.append(newWord);
-            }
-
-            for(int j = 0; j < newWord.count(); j++)
-                charArrayDeCopmression.push_back((uchar)newWord.at(j));
-            i+= (libraryByteRate + 1);
-            ui->progressBar_dataByte->setValue((double)i / charArrayFile.size() * 100.0);
-        }
-        while(i < (int)charArrayFile.size());
-
-        ui->progressBar_dataByte->setValue(100.0);
-        ui->label_ResultSize_value->setText(QString::number(charArrayDeCopmression.size()));
-        time = clock() - time;
-        ui->label_Time_value->setText(QString::number(time));
-
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), "", "");
-        if(!fileName.isEmpty())
-        {
-            file->setFileName(fileName);
-            if(file->open(QIODevice::WriteOnly))
-            {
-                ui->progressBar_dataByte->setValue(0.0);
-                byteArrayFile->clear();
-                byteArrayFile->setRawData(reinterpret_cast<const char*>(charArrayDeCopmression.data()), charArrayDeCopmression.size());
-                file->write(*byteArrayFile);
-                ui->progressBar_dataByte->setValue(100.0);
-                file->close();
-            }
+            ui->progressBar_dataByte->setValue(0.0);
+            byteArrayFile->clear();
+            byteArrayFile->setRawData(reinterpret_cast<const char*>(out.data()), out.size());
+            file->write(*byteArrayFile);
+            ui->progressBar_dataByte->setValue(100.0);
+            file->close();
         }
     }
 }

@@ -13,8 +13,12 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    clzwcompressor.cpp \
+    clzwdecompressor.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    clzwcompressor.h \
+    clzwdecompressor.h
 
 FORMS    += mainwindow.ui
