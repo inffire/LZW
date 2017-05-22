@@ -14,13 +14,13 @@ CLZWCompressor::CLZWCompressor(int libraryAddressLength)
     _libraryLength = pow(255, _libraryAddressLength);
 }
 
-size_t CLZWCompressor::compress(std::vector<uchar>& input, std::vector<uchar>& output)
+size_t CLZWCompressor::compress(std::vector<uchar>* input, std::vector<uchar>* output)
 {
-    size_t file_size = input.size();
+    size_t file_size = input->size();
     if(!(file_size > 0))
         return 0;
 
-    output.clear();
+    output->clear();
 
     uint        cursor_position = 0;
     char        cursor_word = 0;
@@ -43,7 +43,7 @@ size_t CLZWCompressor::compress(std::vector<uchar>& input, std::vector<uchar>& o
         address_found = false;
         do
         {
-            cursor_word = input.at(cursor_position);
+            cursor_word = input->at(cursor_position);
             word_to_find.append(cursor_word);
             current_library_address = byteArrayLibrary.indexOf(word_to_find, current_library_address);
             if(current_library_address > 0)
@@ -67,9 +67,9 @@ size_t CLZWCompressor::compress(std::vector<uchar>& input, std::vector<uchar>& o
             }
         }
         while(address_found);
-        for(char b = 0; b < _libraryAddressLength; ++b)
-            output.push_back((library_address >> (b * 8)) & 0xFF);
-        output.push_back(cursor_word);
+        for(char b = _libraryAddressLength - 1; b >= 0; --b)
+            output->push_back((library_address >> (b * 8)) & 0xFF);
+        output->push_back(cursor_word);
 
         if(byteArrayLibrary.count() < _libraryLength)
         {
@@ -77,10 +77,10 @@ size_t CLZWCompressor::compress(std::vector<uchar>& input, std::vector<uchar>& o
             emit library_capacity_changed((int)(byteArrayLibrary.length() / _libraryLength * 100.0f));
         }
 
-        emit passed_process((int)(cursor_position / (float)file_size * 100.0f));
+        emit passed_process((int)(1 + cursor_position / (float)file_size * 100.0f));
         cursor_position++;
     }
     while(cursor_position < file_size);
-    qDebug() << clock() - t << "ms" << output.size() << "bytes @" << (float)file_size/output.size() << "x";
-    return output.size();
+    qDebug() << clock() - t << "ms" << output->size() << "bytes @" << (float)file_size/output->size() << "x";
+    return output->size();
 }

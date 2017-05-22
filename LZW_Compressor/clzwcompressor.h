@@ -24,7 +24,7 @@ public:
     inline void set_library_address_length(int v) { ((v > 0) && (v < 4)) ? _libraryAddressLength = v : _libraryAddressLength = 1;
                                                   _libraryLength = pow(255, _libraryAddressLength); }
 
-    size_t compress(std::vector<uchar>& input, std::vector<uchar>& output);
+    size_t compress(std::vector<uchar>* input, std::vector<uchar>* output);
 
 signals:
     void passed_process(int p);

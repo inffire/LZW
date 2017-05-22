@@ -14,13 +14,13 @@ CLZWDecompressor::CLZWDecompressor(int libraryAddressLength)
     _libraryLength = pow(255, _libraryAddressLength);
 }
 
-size_t CLZWDecompressor::decompress(std::vector<uchar>& input, std::vector<uchar>& output)
+size_t CLZWDecompressor::decompress(std::vector<uchar>* input, std::vector<uchar>* output)
 {
-    size_t file_size = input.size();
+    size_t file_size = input->size();
     if(!(file_size > 0))
         return 0;
 
-    output.clear();
+    output->clear();
 
     QByteArray  address_to_find;
     QByteArray  new_word;
@@ -37,7 +37,7 @@ size_t CLZWDecompressor::decompress(std::vector<uchar>& input, std::vector<uchar
         new_word.clear();
         for(int b = 0; b < _libraryAddressLength; ++b)
         {
-            address_to_find.append(input.at(cursor_position + b));
+            address_to_find.append(input->at(cursor_position + b));
         }
         int addr_int = 0;
         for(int i = 0; i < _libraryAddressLength; i++)
@@ -46,8 +46,8 @@ size_t CLZWDecompressor::decompress(std::vector<uchar>& input, std::vector<uchar
         }
         if(addr_int != 0)
             new_word.append(byteArrayLibrary.at(addr_int));
-        if(!((cursor_position + _libraryAddressLength) == (file_size - 1) && (input.at(cursor_position + _libraryAddressLength) == 0)))
-            new_word.append(input.at(cursor_position + _libraryAddressLength));
+        if(!((cursor_position + _libraryAddressLength) == (file_size - 1) && (input->at(cursor_position + _libraryAddressLength) == 0)))
+            new_word.append(input->at(cursor_position + _libraryAddressLength));
 
         if(byteArrayLibrary.count() < _libraryLength)
         {
@@ -56,12 +56,12 @@ size_t CLZWDecompressor::decompress(std::vector<uchar>& input, std::vector<uchar
         }
 
         for(int j = 0; j < new_word.count(); ++j)
-            output.push_back((uchar)new_word.at(j));
+            output->push_back((uchar)new_word.at(j));
 
-        emit passed_process((int)(cursor_position / (float)file_size * 100.0f));
+        emit passed_process((int)(1 + cursor_position / (float)file_size * 100.0f));
         cursor_position += (_libraryAddressLength + 1);
     }
     while(cursor_position < file_size);
-    qDebug() << clock() - t << "ms" << output.size() << "bytes @" << (float)output.size()/file_size << "x";
-    return output.size();
+    qDebug() << clock() - t << "ms" << output->size() << "bytes @" << (float)output->size()/file_size << "x";
+    return output->size();
 }

@@ -54,7 +54,7 @@ void MainWindow::on_actionCompress_triggered()
     connect(&c, SIGNAL(passed_process(int)), ui->progressBar_dataByte, SLOT(setValue(int)));
     connect(&c, SIGNAL(library_capacity_changed(int)), ui->progressBar_dataLibrary, SLOT(setValue(int)));
     c.set_library_address_length((int)ui->doubleSpinBox_LibraryByteRate->value());
-    c.compress(charArrayFile, out);
+    c.compress(&charArrayFile, &out);
 
     ui->label_Time_value->setText(QString::number(clock() - t));
 
@@ -81,7 +81,7 @@ void MainWindow::on_actionDeCompress_triggered()
     connect(&d, SIGNAL(passed_process(int)), ui->progressBar_dataByte, SLOT(setValue(int)));
     connect(&d, SIGNAL(library_capacity_changed(int)), ui->progressBar_dataLibrary, SLOT(setValue(int)));
     d.set_library_address_length((int)ui->doubleSpinBox_LibraryByteRate->value());
-    d.decompress(charArrayFile, out);
+    d.decompress(&charArrayFile, &out);
 
     ui->label_Time_value->setText(QString::number(clock() - t));
 
