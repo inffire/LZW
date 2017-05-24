@@ -15,10 +15,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     clzwcompressor.cpp \
-    clzwdecompressor.cpp
+    clzwdecompressor.cpp \
+    cbenchmark.cpp
 
 HEADERS  += mainwindow.h \
     clzwcompressor.h \
-    clzwdecompressor.h
+    clzwdecompressor.h \
+    cbenchmark.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    cbenchmark.ui

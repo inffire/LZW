@@ -149,7 +149,14 @@
     <addaction name="actionCompress"/>
     <addaction name="actionDeCompress"/>
    </widget>
+   <widget class="QMenu" name="menuBenchmark">
+    <property name="title">
+     <string>Benchmark</string>
+    </property>
+    <addaction name="actionBenchmarkSettings"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuBenchmark"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionOpen">
@@ -165,6 +172,11 @@
   <action name="actionDeCompress">
    <property name="text">
     <string>DeCompress</string>
+   </property>
+  </action>
+  <action name="actionBenchmarkSettings">
+   <property name="text">
+    <string>Settings</string>
    </property>
   </action>
  </widget>

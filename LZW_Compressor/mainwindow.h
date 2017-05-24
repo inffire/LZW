@@ -11,6 +11,7 @@
 #include <vector>
 #include "clzwcompressor.h"
 #include "clzwdecompressor.h"
+#include "cbenchmark.h"
 
 namespace Ui {
 class MainWindow;
@@ -38,6 +39,8 @@ private slots:
     void on_actionDeCompress_triggered();
 
     void on_doubleSpinBox_LibraryByteRate_valueChanged(double arg1);
+
+    void on_actionBenchmarkSettings_triggered();
 
 private:
     Ui::MainWindow *ui;

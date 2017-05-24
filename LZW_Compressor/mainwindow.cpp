@@ -107,3 +107,9 @@ void MainWindow::on_doubleSpinBox_LibraryByteRate_valueChanged(double arg1)
     librarySize = pow(256, libraryByteRate);
     ui->label_LibraryLength_value->setText(QString::number(librarySize));
 }
+
+void MainWindow::on_actionBenchmarkSettings_triggered()
+{
+    CBenchmark* bw = new CBenchmark(this);
+    bw->show();
+}
